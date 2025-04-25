@@ -32,67 +32,67 @@ namespace Test
         {
             this.preferences[key] = value;
 
-
-            if (typeof(T) == typeof(string))
+            switch (value)
             {
-                PlayerPrefs.SetString(key, (string)(object)value);
+                case string s:
+                    PlayerPrefs.SetString(key, s);
+                    break;
+                case bool b:
+                    PlayerPrefs.SetInt(key, b ? 1 : 0);
+                    break;
+                case int i:
+                    PlayerPrefs.SetInt(key, i);
+                    break;
+                case float f:
+                    PlayerPrefs.SetFloat(key, f);
+                    break;
+                case double d:
+                    PlayerPrefs.SetString(key, d.ToString());
+                    break;
+                default:
+                    if (typeof(T).IsEnum)
+                    {
+                        PlayerPrefs.SetInt(key, (int)(object)value);
+                    }
+                    else
+                    {
+                        throw new ArgumentException($"Unsupported type: {typeof(T)}");
+                    }
+                    break;
             }
-            else if (typeof(T) == typeof(bool))
-            {
-                PlayerPrefs.SetInt(key, ((bool)(object)value ? 1 : 0));
-            }
-            else if (value is Enum)
-            {
-                PlayerPrefs.SetInt(key, (int)(object)value);
-            }
-            else
-            {
-                throw new ArgumentException();
-            }
-
 
             if (savePrefs)
             {
-                this.SavePrefs();
+                SavePrefs();
             }
         }
-
 
         public T GetPref<T>(string key)
         {
-            if (this.preferences.TryGetValue(key, out object value))
+            if (preferences.TryGetValue(key, out object value))
             {
-                if (typeof(Enum).IsAssignableFrom(typeof(T)))
+                if (typeof(T).IsEnum)
                 {
-                    return (T)(object)Convert.ToInt32(value);
+                    return (T)Enum.ToObject(typeof(T), Convert.ToInt32(value));
                 }
-
-
-                return (T)this.preferences[key];
+                return (T)Convert.ChangeType(value, typeof(T));
             }
-
 
             if (typeof(T) == typeof(string))
-            {
                 return (T)(object)PlayerPrefs.GetString(key);
-            }
-
-
             if (typeof(T) == typeof(bool))
-            {
                 return (T)(object)(PlayerPrefs.GetInt(key) != 0);
-            }
+            if (typeof(T) == typeof(int))
+                return (T)(object)PlayerPrefs.GetInt(key);
+            if (typeof(T) == typeof(float))
+                return (T)(object)PlayerPrefs.GetFloat(key);
+            if (typeof(T) == typeof(double))
+                return (T)(object)double.Parse(PlayerPrefs.GetString(key));
+            if (typeof(T).IsEnum)
+                return (T)Enum.ToObject(typeof(T), PlayerPrefs.GetInt(key));
 
-
-            if (typeof(Enum).IsAssignableFrom(typeof(T)))
-            {
-                return (T)(object)Convert.ToInt32(PlayerPrefs.GetInt(key));
-            }
-
-
-            throw new ArgumentException();
+            throw new ArgumentException($"Unsupported type: {typeof(T)}");
         }
-
 
         public T GetPref<T>(string key, T defaultValue)
         {

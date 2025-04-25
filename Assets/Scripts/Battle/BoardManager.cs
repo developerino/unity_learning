@@ -39,6 +39,14 @@ public class BoardManager : MonoBehaviour
 
             }
         }
+        if (Input.GetKey("l"))
+        {
+            string saved = PlayerData.PlayerPreferences.GetPref<string>("position", "{}");
+            SerializeVector3 loaded = JsonConvert.DeserializeObject<SerializeVector3>(saved);
+            Debug.Log($"Loaded position: {loaded.x}, {loaded.y}, {loaded.z}");
+            Piece.transform.position = loaded.ToVector3();
+        }
+
     }
 }
 
