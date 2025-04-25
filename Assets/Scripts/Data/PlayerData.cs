@@ -4,16 +4,13 @@ using UnityEngine;
 public class PlayerData : MonoBehaviour
 {
     private PlayerPreferences playerPreferences;
+
     public static PlayerData Instance { get; private set; }
     public static PlayerPreferences PlayerPreferences => Instance.playerPreferences;
 
-    void Start()
+    private void Awake()
     {
-        
-    }
-
-    void Update()
-    {
-        
+        Instance = this;
+        playerPreferences = new PlayerPreferences();
     }
 }
