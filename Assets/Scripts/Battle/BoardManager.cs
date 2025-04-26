@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
-using Test;
 using UnityEngine;
 
 public class BoardManager : MonoBehaviour
@@ -9,8 +8,10 @@ public class BoardManager : MonoBehaviour
     [SerializeField] private List<TileProperty> TilePropsList;
     [SerializeField] private GameObject Piece;
 
-    private void Start()
+    public void InitializeBoard()
     {
+        Debug.Log("BoardManager initialized by GameManager!");
+
         TilePropsList = new List<TileProperty>();
         int id = 1;
         foreach (Transform tileChild in this.transform)
@@ -19,7 +20,7 @@ public class BoardManager : MonoBehaviour
             tempRef.set_id(id);
             tempRef.set_owner(OWNER.NONE);
 
-            Debug.Log($"Child id is: {tempRef.get_id()} and owner is: {tempRef.get_owner()} and name: {tempRef.gameObject.name}");
+            //Debug.Log($"Child id is: {tempRef.get_id()} and owner is: {tempRef.get_owner()} and name: {tempRef.gameObject.name}");
             TilePropsList.Add(tempRef);
             id++;
         }

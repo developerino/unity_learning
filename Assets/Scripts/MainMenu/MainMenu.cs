@@ -11,32 +11,20 @@ public class MainMenu : MonoBehaviour
 
     private void Awake()
     {
-        Debug.Log("Awake");
+        Debug.Log("MainMenu set btns listeners on Awake");
         Btn_Start.onClick.AddListener(btn_start);
         Btn_Exit.onClick.AddListener(btn_exit);
-    }
-    void Start()
-    {
-        Debug.Log("Started");
-    }
-
-    void Update()
-    {
-        if (Input.GetKey(KeyCode.Space))
-        {
-            Debug.Log("Space key pressed");
-        }
     }
 
     public void btn_start()
     {
         SceneManager.LoadScene(SceneName);
-        Debug.Log("Game started!");
+        Debug.Log("btn_start Game started!");
         PlayerPrefs.SetString(OWNER.PLAYER.ToString(), "tom");
     }
     public void btn_exit()
     {
-        Debug.Log("Unity quitted");
+        Debug.Log("btn_exit Unity quitted");
         Application.Quit();
     }
 }

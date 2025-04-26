@@ -1,4 +1,3 @@
-using Test;
 using UnityEngine;
 
 public class PlayerData : MonoBehaviour
