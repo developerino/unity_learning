@@ -1,18 +1,21 @@
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class SaveManager : MonoBehaviour
 {
     private static string SaveFolder => Application.persistentDataPath;
     private static string SaveFilePath => Path.Combine(SaveFolder, "savefile.json");
 
+    private static string pendingSaveJson = null;
+
     public static void SaveGame()
     {
         Debug.Log("SaveManager: Saving game...");
 
         WorldSaveData worldData = new WorldSaveData();
-        worldData.CurrentSceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+        worldData.CurrentSceneName = SceneManager.GetActiveScene().name;
 
         SaveableEntity[] entities = GameObject.FindObjectsOfType<SaveableEntity>();
 
@@ -25,7 +28,7 @@ public class SaveManager : MonoBehaviour
                 Position = SerializationUtils.SerializeVector3(entity.transform.position),
                 Rotation = SerializationUtils.SerializeVector3(entity.transform.rotation.eulerAngles),
                 Scale = SerializationUtils.SerializeVector3(entity.transform.localScale),
-                ExtraData = new Dictionary<string, string>() // Can be populated later
+                ExtraData = new Dictionary<string, string>() // Will be used later
             };
 
             worldData.Entities.Add(data);
@@ -56,13 +59,39 @@ public class SaveManager : MonoBehaviour
             return;
         }
 
+        pendingSaveJson = json;
+
+        Debug.Log($"SaveManager: Reloading scene {worldData.CurrentSceneName}...");
+        SceneManager.sceneLoaded += OnSceneLoaded;
+        SceneManager.LoadScene(worldData.CurrentSceneName);
+    }
+
+    private static void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+
+        if (string.IsNullOrEmpty(pendingSaveJson))
+        {
+            Debug.LogError("SaveManager: No pending save json after scene load.");
+            return;
+        }
+
+        Debug.Log("SaveManager: Scene loaded, restoring world...");
+
+        WorldSaveData worldData = JsonUtility.FromJson<WorldSaveData>(pendingSaveJson);
+        LoadWorldData(worldData);
+
+        pendingSaveJson = null;
+    }
+
+    private static void LoadWorldData(WorldSaveData worldData)
+    {
         SaveableEntity[] existingEntities = GameObject.FindObjectsOfType<SaveableEntity>();
 
         foreach (var entityData in worldData.Entities)
         {
             SaveableEntity foundEntity = null;
 
-            // Try to find if entity already exists
             foreach (var entity in existingEntities)
             {
                 if (entity.StableID == entityData.StableID)
@@ -74,15 +103,12 @@ public class SaveManager : MonoBehaviour
 
             if (foundEntity != null)
             {
-                // Update existing entity
-                Debug.Log($"SaveManager: Found existing entity {foundEntity.name}, updating...");
                 foundEntity.transform.position = SerializationUtils.DeserializeVector3(entityData.Position);
                 foundEntity.transform.rotation = Quaternion.Euler(SerializationUtils.DeserializeVector3(entityData.Rotation));
                 foundEntity.transform.localScale = SerializationUtils.DeserializeVector3(entityData.Scale);
             }
             else
             {
-                // Spawn new entity
                 GameObject prefab = PrefabDatabase.GetPrefab(entityData.PrefabID);
                 if (prefab == null)
                 {
@@ -90,7 +116,7 @@ public class SaveManager : MonoBehaviour
                     continue;
                 }
 
-                GameObject instance = Object.Instantiate(prefab);
+                GameObject instance = Instantiate(prefab);
                 instance.transform.position = SerializationUtils.DeserializeVector3(entityData.Position);
                 instance.transform.rotation = Quaternion.Euler(SerializationUtils.DeserializeVector3(entityData.Rotation));
                 instance.transform.localScale = SerializationUtils.DeserializeVector3(entityData.Scale);
@@ -105,6 +131,6 @@ public class SaveManager : MonoBehaviour
             }
         }
 
-        Debug.Log("SaveManager: Game loaded successfully.");
+        Debug.Log("SaveManager: World loaded successfully.");
     }
 }
