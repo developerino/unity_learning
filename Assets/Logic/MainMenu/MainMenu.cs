@@ -2,6 +2,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using static GameManager;
 
 public class MainMenu : MonoBehaviour
 {
@@ -11,7 +12,7 @@ public class MainMenu : MonoBehaviour
 
     private void Awake()
     {
-        Debug.Log("MainMenu set btns listeners on Awake");
+        Debug.Log("MainMenu: set btns listeners on Awake");
         Btn_Start.onClick.AddListener(btn_start);
         Btn_Exit.onClick.AddListener(btn_exit);
     }

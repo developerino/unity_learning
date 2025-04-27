@@ -1,32 +1,26 @@
 using UnityEngine;
+using static GameManager;
 
 public class TileProperty : MonoBehaviour
 {
     [SerializeField] private int id;
     [SerializeField] private OWNER owner;
 
-    public int get_id()
+    public int GetId()
     {
         return id;
     }
-    public void set_id(int new_id)
+    public void SetId(int new_id)
     {
         id = new_id;
     }
 
-    public OWNER get_owner()
+    public OWNER GetOwner()
     {
         return owner;
     }
-    public void set_owner(OWNER new_owner)
+    public void SetOwner(OWNER new_owner)
     {
         owner = new_owner;
     }
-}
-
-public enum OWNER
-{
-    NONE,
-    PLAYER,
-    NPC
 }

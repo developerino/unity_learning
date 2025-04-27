@@ -9,13 +9,13 @@ public class InitGameManager
 
         if (gameManagerPrefab != null)
         {
-            Debug.Log("Instantiate the GameManager prefab and set it to not be destroyed on load.");
+            Debug.Log("InitGameManager: Instantiate the GameManager prefab and set it to not be destroyed on load.");
             GameObject gameManagerInstance = Object.Instantiate(gameManagerPrefab);
             Object.DontDestroyOnLoad(gameManagerInstance);
         }
         else
         {
-            Debug.LogError("GameManagerPrefab could not be found in Resources/Prefabs.");
+            Debug.LogError("InitGameManager: GameManagerPrefab could not be found in Resources/Prefabs.");
         }
     }
 }
