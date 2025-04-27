@@ -1,31 +1,45 @@
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using static GameManager;
 
 public class MainMenu : MonoBehaviour
 {
-    [SerializeField] private Button Btn_Start;
-    [SerializeField] private Button Btn_Exit;
-    [SerializeField] private string SceneName;
+    [SerializeField] private Button _btnNewGame;
+    [SerializeField] private Button _btnLoadGame;
+    [SerializeField] private Button _btnSettings;
+    [SerializeField] private Button _btnExit;
 
     private void Awake()
     {
-        Debug.Log("MainMenu: set btns listeners on Awake");
-        Btn_Start.onClick.AddListener(btn_start);
-        Btn_Exit.onClick.AddListener(btn_exit);
+        Debug.Log("MainMenu: Setting up button listeners");
+        _btnNewGame.onClick.AddListener(OnNewGameClicked);
+        _btnLoadGame.onClick.AddListener(OnLoadGameClicked);
+        _btnSettings.onClick.AddListener(OnSettingsClicked);
+        _btnExit.onClick.AddListener(OnExitClicked);
     }
 
-    public void btn_start()
+    private void OnNewGameClicked()
     {
-        SceneManager.LoadScene(SceneName);
-        Debug.Log("btn_start Game started!");
-        PlayerPrefs.SetString(OWNER.PLAYER.ToString(), "tom");
+        Debug.Log("MainMenu: New Game button clicked, loading Battle scene...");
+        SceneManager.LoadScene("Battle");
     }
-    public void btn_exit()
+
+    private void OnLoadGameClicked()
     {
-        Debug.Log("btn_exit Unity quitted");
+        Debug.Log("MainMenu: Load Game button clicked, loading saved game...");
+        SaveManager.LoadGame();
+    }
+
+    private void OnSettingsClicked()
+    {
+        Debug.Log("MainMenu: Settings button clicked");
+
+        // TODO: Show Settings UI (not load new scene! Overlay is better for in-game Settings)
+    }
+
+    private void OnExitClicked()
+    {
+        Debug.Log("MainMenu: Exit button clicked, quitting game...");
         Application.Quit();
     }
 }
