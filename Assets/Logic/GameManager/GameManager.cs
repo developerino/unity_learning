@@ -37,8 +37,18 @@ public class GameManager : AutoSingleton<GameManager>
     }
     private void OnSceneChanged(Scene oldScene, Scene newScene)
     {
-        // Try to parse to SCENE_NAME Enum (case-insensitive)
-        if (Enum.TryParse(newScene.name, ignoreCase: true, out SCENE_NAME sceneEnum))
+        StartCoroutine(HandleSceneChange(newScene));
+    }
+
+    private IEnumerator HandleSceneChange(Scene newScene)
+    {
+        string newSceneName = newScene.name;
+        if (TransitionManager.Instance != null)
+        {
+            yield return TransitionManager.Instance.FadeIn(null, 2.0f);
+        }
+
+        if (Enum.TryParse(newSceneName, ignoreCase: true, out SCENE_NAME sceneEnum))
         {
             LOADED_SCENE = sceneEnum;
         }
@@ -51,8 +61,9 @@ public class GameManager : AutoSingleton<GameManager>
         {
             case SCENE_NAME.MAINMENU:
                 Debug.Log("GameManager: Scene is MAINMENU!");
-                // TODO: Add MainMenu specific logic here
+                InputManager.EnableInput(false);
                 break;
+
             case SCENE_NAME.BATTLE:
                 Debug.Log("GameManager: Scene is BATTLE!");
                 BoardManager board = FindObjectOfType<BoardManager>();
@@ -60,18 +71,22 @@ public class GameManager : AutoSingleton<GameManager>
                 {
                     Debug.Log("GameManager: BoardManager.InitializeBoard() now!");
                     board.InitializeBoard();
+                    InputManager.EnableInput(true);
                 }
                 else
                 {
                     Debug.LogWarning("GameManager: BoardManager not found!");
                 }
                 break;
+
             case SCENE_NAME.UNKNOWN:
             default:
-                Debug.LogError("GameManager: Scene is UNKNOWN or not handled!");
+                Debug.LogError("GameManager: Scene is UNKNOWN or not handled!: " + newSceneName);
+                InputManager.EnableInput(false);
                 break;
         }
     }
+
     // --- ENUMS ---
     public enum OWNER
     {

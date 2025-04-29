@@ -5,14 +5,24 @@ using static GameManager;
 
 public class BoardManager : MonoBehaviour
 {
-    [SerializeField] private List<TileProperty> TilePropsList;
-    [SerializeField] private GameObject Piece;
+    [SerializeField] private List<TileProperty> _tilePropsList;
+    [SerializeField] private GameObject _piece;
+
+    private void OnEnable()
+    {
+        InputManager.OnWorldClick += HandleWorldClick;
+    }
+
+    private void OnDisable()
+    {
+        InputManager.OnWorldClick -= HandleWorldClick;
+    }
 
     public void InitializeBoard()
     {
-        Debug.Log("BoardManager: initialized by GameManager.");
+        Debug.Log("BoardManager: Initialized by GameManager.");
 
-        TilePropsList = new List<TileProperty>();
+        _tilePropsList = new List<TileProperty>();
         int id = 1;
         foreach (Transform tileChild in transform)
         {
@@ -20,31 +30,19 @@ public class BoardManager : MonoBehaviour
             tempRef.SetId(id);
             tempRef.SetOwner(OWNER.NONE);
 
-            TilePropsList.Add(tempRef);
+            _tilePropsList.Add(tempRef);
             id++;
         }
-
-        // Save the piece position using generic SetPref
-        PlayerData.PlayerPreferences.SetPref("position", Piece.transform.position);
     }
 
-    private void Update()
+    private void HandleWorldClick(Vector3 clickPosition)
     {
-        if (Input.GetMouseButtonDown(0))
+        // Responds to clicks cleanly
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        if (Physics.Raycast(ray, out RaycastHit hit))
         {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out RaycastHit hit))
-            {
-                Debug.Log($"BoardManager: Raycasted object is: {hit.collider.gameObject.name}");
-            }
+            Debug.Log($"BoardManager: Raycasted object is: {hit.collider.gameObject.name}");
+            // TODO: Add board-specific reactions here
         }
-
-        //if (Input.GetKey("l"))
-        //{
-        //    // Load the position using generic GetPref
-        //    Vector3 loaded = PlayerData.PlayerPreferences.GetPref("position", Vector3.zero);
-        //    Debug.Log($"BoardManager: Loaded position: {loaded.x}, {loaded.y}, {loaded.z}");
-        //    Piece.transform.position = loaded;
-        //}
     }
 }

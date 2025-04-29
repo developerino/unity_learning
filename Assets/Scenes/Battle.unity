@@ -1072,8 +1072,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 42a7d2639719aef47856157b3459af1d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  TilePropsList: []
-  Piece: {fileID: 531059336}
+  _tilePropsList: []
+  _piece: {fileID: 0}
 --- !u!1 &1356553273
 GameObject:
   m_ObjectHideFlags: 0
