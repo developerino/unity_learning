@@ -1,4 +1,5 @@
-# Good Architecture.
+# A well deved Unity project - base.
+This is a boilerplate Unity project with Scene and Save managers.
 
 A GameManagerPrefab is added automatically, thanks to using
 ```C#
